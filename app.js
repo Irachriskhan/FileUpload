@@ -3,6 +3,7 @@ require("express-async-errors");
 
 const express = require("express");
 const app = express();
+const fileUpload = require("express-fileupload");
 
 // database
 const connectDB = require("./db/connect");
@@ -11,22 +12,25 @@ const connectDB = require("./db/connect");
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 
-app.get("/", (req, res) => {
-  res.send("<h1>File Upload Starter</h1>");
-});
+const productRoute = require("./routes/productRoutes");
+
+app.use(express.json());
+app.use(express.static("./public"));
+app.use(fileUpload());
+app.use("/api/v1/products", productRoute);
 
 // middleware
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3004;
 
 const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI);
 
     app.listen(port, () =>
-      console.log(`Server is listening on port ${port}...`)
+      console.log(`FileUpload app is accessible on  http://localhost:${port}`)
     );
   } catch (error) {
     console.log(error);
